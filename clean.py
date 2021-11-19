@@ -13,21 +13,27 @@ charset = sorted(set(charset))
 charset.remove('')
 
 lines = open('data/charset.txt', encoding='utf-8').read().split('\n')
-am_alphabet = lines[0]
-am_digits = lines[1]
-am_punc = lines[2]
+am_alphabet = lines[0].strip()
+am_digits = lines[1].strip()
+am_punc = lines[2].strip()
+en_punc = lines[3].strip()
+en_digits = string.digits
+helper_chars = lines[4].strip()
 # Normalizing map
 # character mapping that will be used to map weired (semnatically similar but different unicode chars)
 # characters to common, well known semantically similar characters
 char_mapping = {
     "(": "[ {".split(' '),  # Exmaple: replace [] by (
     ")": "] }".split(' '),
-    '"': "< >〈 〉 《 》 ′ ″ ‶ ‹ › ‘ ’ ‛ “ ”  ፞  ፟ ̋  ̎  ʻ ʼ ʽ ʾ ʿ » ´ « ¨ ` '".split(' '),
-    "#": '0 1 2 3 4 5 6 7 8 9'.split(' '),
-    "፣": '߹ :',
-    " ": ' ',
-    '-': '– —— —– —-'
+    '"': "< > 〈 〉《 》 ′ ″ ‶ ‹ › ‘ ’ ‛ “ ”  ፞  ፟ ̋  ̎  ʻ ʼ ʽ ʾ ʿ » ´ « ¨ ` '",
+    "፣": '߹ :'.split(),
+    '-': '– —— —– —-'.split()
 }
+# for ik, (k, v) in enumerate(char_mapping.items()):
+    
+#     for vsx in v:
+#         if len(vsx.strip()) != 0:
+#             print(vsx + "=" + k)
 # character mapping that will be used to string made up of two or more characters
 # that were put to signify a single character purpose
 reps = {
@@ -35,6 +41,11 @@ reps = {
     "።": ":: ∶∶ ：： ᎓᎓ ፡፡ ። ˸˸ ::".split(' '),
     "፦": [':-', ': -', '፡ -', '፡-']
 }
+# for ik, (k, v) in enumerate(reps.items()):
+    
+#     for vsx in v:
+#         if len(vsx.strip()) != 0:
+#             print(vsx + "=" + k)
 
 unk_char = "u"  # unknown word to replace with unknown tokens
 reps_map = {}  # reversing the mapping
@@ -185,18 +196,18 @@ def clean_to_text(line):
     line = re.sub(patter, '…', line)
     # patter = re.compile(r'(\.)')
     # line = re.sub(patter, '…', line) # replace multiple '.' with single '…' e.g ... => …
-    patter = re.compile('(#)')
+    # patter = re.compile('(#)')
     # replace multiple '#' with single '#' e.g ### => #
-    line = re.sub(patter, '#', line)
-    line = re.sub(r'#+', "#", line)
-    line = re.sub('ዓ.ም.', "ዓ.ም", line)
+    # line = re.sub(patter, '#', line)
+    # line = re.sub(r'#+', "#", line)
+    # line = re.sub('ዓ.ም.', "ዓ.ም", line)
     line = re.sub(r'(\.)\1{1,}', "…", line)
     # replace multiple '…' with single '…' e.g …… => …
     line = re.sub(r'\…+', "…", line)
     # replace multiple '… ' with single '… …' e.g … … => …
     line = re.sub(r'\…\s+', "…", line)
     # replace multiple '… ' with single '… …' e.g … … => …
-    line = re.sub(r'u+', "u", line)
+    # line = re.sub(r'u+', "u", line)
     # replace multiple '… ' with single '- -' e.g - - => …
     line = re.sub(r'-+', "-", line)
     # replace multiple '… ' with single '- -' e.g - - => …
@@ -224,9 +235,24 @@ def clean_to_text(line):
             valid_words.append(unk_char)
 
     line = " ".join(valid_words)
-    line = replace_non_am_with_unk(line)
+    line = re.sub(f'[^{am_alphabet}{am_digits}{am_punc}{en_digits}{en_punc[:-1]}\- ]', unk_char, line)
+    line = re.sub(f"u+\s", ' unk ', line)
+    line = re.sub(r'\s+', " ", line).strip()
+    # print(line)
+    # line = replace_non_am_with_unk(line)
     return line
 
-text = "‹‹በኢትዮጵያ የተሻለ ጠ/ ሚ/ ር ነገ wvfvእንዲመጣ የበኩሌን አስተዋጽኦ ማድረግ እንዳለብኝ አምናለሁ›› ርዕዮት ዓለሙ "
-print(text)
-print(clean_to_text(text))
+# with open('data/clean_corpus.txt', encoding='utf-8', mode='w') as newF:
+#     with open('data/corpus.txt', encoding='utf-8', mode='r') as oldF:
+#         for line in oldF:
+#             line = line.strip()
+#             line = clean_to_text(line)
+#             newF.write(line)
+#             newF.write(' ')
+
+
+# text = open('data/clean_corpus.txt', encoding='utf-8').read()
+# # text = "unk wow unk unk unk wow unk"
+# text = 'unk'.join([x for x in text.split('unk') if x.strip() != ''])
+# print(len(text.split(' ')))
+# open('data/clean_corpus.txt', encoding='utf-8', mode='w').write(text)
