@@ -1,1 +1,2 @@
-data/*
+xdata/*
+__pycache__/*
