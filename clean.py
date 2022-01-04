@@ -32,7 +32,7 @@ def clean_text(line):
         line = line.replace(k, v)
     line = line.strip()  # remove aby trailing spaces around the text
     line = _clean_multiple_chars('"', line)  # replace multiple '"' with single '"' e.g """" => "
-    line = _clean_multiple_chars('!', line)  # replace multiple '!' with single '!' e.g !!! => !
+    # line = _clean_multiple_chars('!', line)  # replace multiple '!' with single '!' e.g !!! => !
     patter = re.compile(r'(\. )')
     # replace multiple '. ' with single '…' e.g . . . . => …
     line = re.sub(patter, '…', line)
@@ -46,15 +46,15 @@ def clean_text(line):
     # replace multiple '… ' with single '- -' e.g - - => …
     line = re.sub(r'\-\s+', "- ", line)
 
-    new_line = []
-    for c in line:
-        if c in space:
-            # add space around a character if it needs
-            new_line.append(" {0} ".format(c))
-        else:
-            # inset the character without adding space aorund it
-            new_line.append(c)
-    line = "".join(new_line).strip()
+    # new_line = []
+    # for c in line:
+    #     if c in space:
+    #         # add space around a character if it needs
+    #         new_line.append(" {0} ".format(c))
+    #     else:
+    #         # inset the character without adding space aorund it
+    #         new_line.append(c)
+    # line = "".join(new_line).strip()
     # finally, replace multiple spaces with a single one
     line = re.sub(r'\s+', " ", line).strip()
     sp = line.split(' ')
